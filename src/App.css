@@ -1,0 +1,95 @@
+/* Start Background for form */
+.form-box {
+  padding-bottom: 3px !important;
+}
+.form-bacgrkound {
+  background-image: url(./assets/background.png);
+  background-size: cover;
+  background-position: 25% 30%;
+}
+
+.overlay {
+  background: linear-gradient(
+    45deg,
+    rgba(47, 140, 96, 0.63),
+    rgba(0, 0, 0, 0.62)
+  );
+  min-height: 100vh;
+}
+/* End Background for form */
+/* Start form style  */
+
+.form-control {
+  border: 0 !important;
+  background-color: rgb(240 240 240) !important;
+}
+.form-control:focus {
+  box-shadow: none !important;
+  border: 0 !important;
+}
+.input-group-text {
+  background-color: rgb(240 240 240) !important;
+  display: block;
+  position: relative;
+  border: 0 !important;
+}
+.input-group-text::placeholder {
+  color: rgba(131, 145, 161, 1);
+}
+.input-group-text::after {
+  position: absolute;
+  content: "";
+  background-color: rgba(0, 0, 0, 0.2);
+  height: 70%;
+  width: 1px;
+  left: 95%;
+}
+.show-password {
+  right: 0;
+  top: 50%;
+  z-index: 10;
+  cursor: pointer;
+  transform: translateY(-50%);
+  font-size: 23px;
+  margin-right: 10px;
+  color: rgba(131, 145, 161, 1);
+}
+
+.form-title {
+  font-size: 25px;
+  margin-top: 25px;
+  font-weight: bold;
+}
+.form-desc {
+  font-size: 16px;
+  color: rgba(73, 73, 73, 0.6);
+  margin-bottom: 33px;
+}
+.links:nth-child(2) {
+  color: rgba(74, 163, 90, 1);
+}
+.form-button {
+  background-color: rgba(74, 163, 90, 1);
+  padding: 10px 100px;
+  margin-top: 1rem;
+  margin-bottom: 30px;
+}
+
+/* Start Loading Effect */
+
+.loader {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  border: 4px solid #263238;
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* End Loading Effect */
