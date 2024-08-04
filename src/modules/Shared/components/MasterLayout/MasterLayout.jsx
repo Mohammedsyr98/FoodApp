@@ -1,19 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import SideBar from "../SideBar/SideBar";
 import NavBar from "../NavBar/NavBar";
 import { Outlet } from "react-router-dom";
-export default function MasterLayout() {
+export default function MasterLayout({ userInformation }) {
+  const [dropdownOpenned, setDropdownOpenned] = useState(false);
+
   return (
-    <div className="container-fluid">
-      <div className="row">
-        <div style={{ background: "#607D8B" }} className="col-3 ">
-          <SideBar />
-        </div>
-        <div className="col-9">
-          <NavBar />
-          <div style={{ background: "grey", height: "100vh" }}>
-            <Outlet />
-          </div>
+    <div
+      onClick={() => dropdownOpenned && setDropdownOpenned(false)}
+      className="d-flex">
+      <div>
+        <SideBar />
+      </div>
+      <div className="w-100">
+        <NavBar
+          setDropdownOpenned={setDropdownOpenned}
+          dropdownOpenned={dropdownOpenned}
+          userInformation={userInformation}
+        />
+        <div className="px-3" style={{ height: "100vh" }}>
+          <Outlet />
         </div>
       </div>
     </div>

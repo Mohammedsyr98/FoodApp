@@ -93,3 +93,114 @@
   }
 }
 /* End Loading Effect */
+
+/* start sidebar */
+
+.sidebar .ps-sidebar-container {
+  background-color: #1f263e;
+  border-top-right-radius: 58px;
+  color: white;
+}
+.sidebar .ps-sidebar-container .ps-menuitem-root .ps-menu-button:hover,
+.sidebar .ps-sidebar-container .ps-menuitem-root .ps-active {
+  position: relative;
+  background-color: rgba(0, 146, 71, 0.1);
+}
+.sidebar .ps-sidebar-container a .ps-active {
+  background-color: transparent !important;
+}
+.sidebar .ps-sidebar-container .logo img {
+  width: 50%;
+}
+.sidebar .ps-sidebar-container .logo .ps-menu-button:hover {
+  background-color: transparent;
+}
+.sidebar .ps-sidebar-container .ps-active a {
+  position: relative;
+}
+.ps-active a::after {
+  position: absolute;
+  content: "";
+  width: 3px;
+  height: 100%;
+  background-color: rgba(74, 163, 90, 1);
+  left: 0;
+}
+/* end sidebar */
+
+/* start navbar */
+.dropdown-toggle::after {
+  display: none !important;
+}
+.dropdown-icon {
+  font-size: 25px;
+  transition: all 0.2s ease-in-out;
+  margin-right: 40px;
+}
+.dropdown-icon-rotate {
+  rotate: 180deg;
+  font-size: 25px;
+  margin-right: 40px;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar .form-control {
+  background: transparent !important;
+}
+
+.navbar .search-icon {
+  font-size: 25px;
+}
+/* end navbar */
+
+/* Start Header */
+.header {
+  background-color: rgba(74, 163, 90, 1);
+}
+.header .title {
+  font-size: 40px;
+}
+@media (min-width: 992px) {
+  .header .photo {
+    margin-left: 170px;
+  }
+  .header .text {
+    padding-left: 60px;
+  }
+}
+.header .content {
+  z-index: 3 !important;
+  position: relative;
+}
+/* End Header */
+
+/* start not found */
+
+.not-found {
+  background-image: url(./assets//Vector.png);
+  background-repeat: no-repeat;
+  background-position: right;
+  width: 100vw;
+  min-height: 100vh;
+}
+.not-found .text {
+  margin-left: 1.5rem;
+  padding-bottom: 4rem;
+  font-size: 40px;
+  bottom: 50%;
+}
+.not-found .desc {
+  font-size: 16px;
+  color: rgba(31, 38, 62, 1);
+}
+.not-found .form-button {
+  font-size: 16px;
+  margin-top: 50px;
+}
+.not-found .back-icon {
+  margin-right: 4px;
+}
+.not-found .title {
+  color: rgba(74, 163, 90, 1);
+}
+/* end not found */

@@ -4,30 +4,28 @@ import { IoPhonePortraitOutline } from "react-icons/io5";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { usersUrls } from "../../../../constants/EndPoints";
+import { emailValidation } from "../../../../constants/Validations";
 export default function RequestResetPass() {
   const notify = (message) => toast(message);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
-  const [isloading, SetIsLoading] = useState(false);
+
   const navigate = useNavigate();
   const onSubmit = async (data) => {
-    SetIsLoading(true);
     try {
-      let response = await axios.post(
-        `https://upskilling-egypt.com:3006/api/v1/Users/Reset/Request`,
-        data
-      );
+      let response = await axios.post(usersUrls.resetRequest, data);
       console.log(response);
-      SetIsLoading(false);
-      navigate("/resetpass");
+
+      navigate("/reset-passwword");
       toast.success(response.data.message);
       console.log(data);
     } catch (error) {
       console.log(error);
-      SetIsLoading(false);
+
       toast.error(error.response.data.message);
     }
   };
@@ -53,10 +51,7 @@ export default function RequestResetPass() {
                 placeholder="Enter Your E-mail"
                 {...register("email", {
                   required: "Email Address is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "invalid email address",
-                  },
+                  emailValidation,
                 })}
               />
             </div>
@@ -69,8 +64,10 @@ export default function RequestResetPass() {
             )}
           </div>
 
-          <button className="w-100 form-button text-white border-0 rounded-3">
-            {isloading ? <div className="loader"></div> : "Submit"}
+          <button
+            disabled={isSubmitting}
+            className="w-100 form-button text-white border-0 rounded-3">
+            {isSubmitting ? <div className="loader"></div> : "Submit"}
           </button>
         </form>
       </div>

@@ -7,31 +7,32 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { emailValidation } from "../../../../constants/Validations";
 import "react-toastify/dist/ReactToastify.css";
-export default function Login() {
+import { usersUrls } from "../../../../constants/EndPoints";
+export default function Login({ loginInformation }) {
   const notify = (message) => toast(message);
   const [showPassword, setShowPassword] = useState(true);
   const [isloading, SetIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     SetIsLoading(true);
     try {
       SetIsLoading(false);
-      let response = await axios.post(
-        `https://upskilling-egypt.com:3006/api/v1/Users/Login`,
-        data
-      );
+      let response = await axios.post(usersUrls.login, data);
+      console.log(response);
       navigate("/dashboard");
       toast.success("Login Succefully");
+      loginInformation(response);
     } catch (error) {
       SetIsLoading(false);
 
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     }
   };
   return (
@@ -54,11 +55,7 @@ export default function Login() {
                 className="form-control py-2"
                 placeholder="Enter Your E-mail"
                 {...register("email", {
-                  required: "Email Address is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "invalid email address",
-                  },
+                  emailValidation,
                 })}
               />
             </div>
@@ -87,17 +84,17 @@ export default function Login() {
                 required: true,
               })}
             />
-            {showPassword ? (
-              <BiShow
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            ) : (
-              <BiHide
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            )}
+            <button
+              className="border-0"
+              onClick={() => setShowPassword(!showPassword)}
+              onMouseUp={(e) => e.preventDefault()}
+              onMouseDown={(e) => e.preventDefault()}>
+              {showPassword ? (
+                <BiShow className="show-password position-absolute" />
+              ) : (
+                <BiHide className="show-password position-absolute" />
+              )}
+            </button>
           </div>
           {errors.password && (
             <p className=" text-danger "> This field is required</p>
@@ -106,12 +103,14 @@ export default function Login() {
             <Link to="register" className="text-decoration-none text-black">
               Register Now?
             </Link>
-            <Link to="RequestResetPass" className="text-decoration-none">
+            <Link to="request-reset-passwword" className="text-decoration-none">
               Forget Password?
             </Link>
           </div>
-          <button className="w-100 form-button text-white border-0 rounded-3">
-            {isloading ? <div className="loader"></div> : "Login"}
+          <button
+            disabled={isSubmitting}
+            className="w-100 form-button text-white border-0 rounded-3">
+            {isSubmitting ? <div className="loader"></div> : "Submit"}
           </button>
         </form>
       </div>

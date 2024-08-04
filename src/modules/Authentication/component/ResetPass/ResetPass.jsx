@@ -8,6 +8,11 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usersUrls } from "../../../../constants/EndPoints";
+import {
+  emailValidation,
+  passwordValidation,
+} from "../../../../constants/Validations";
 
 export default function ResetPass() {
   const notify = (message) => toast(message);
@@ -16,16 +21,14 @@ export default function ResetPass() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    getValues,
+    formState: { errors, isSubmitting },
   } = useForm();
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     SetIsLoading(true);
     try {
-      let response = await axios.post(
-        `https://upskilling-egypt.com:3006/api/v1/Users/Reset`,
-        data
-      );
+      let response = await axios.post(usersUrls.reset, data);
       navigate("/login");
       SetIsLoading(false);
       toast.success(response.data.message);
@@ -59,11 +62,7 @@ export default function ResetPass() {
                 className="form-control py-2"
                 placeholder="Enter Your E-mail"
                 {...register("email", {
-                  required: "Email Address is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "invalid email address",
-                  },
+                  emailValidation,
                 })}
               />
             </div>
@@ -105,25 +104,20 @@ export default function ResetPass() {
               placeholder="New Password"
               {...register("password", {
                 required: true,
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                  message:
-                    "The password must include at least one lowercase letter, one uppercase letter, one digit, one special character, and be at least 6 characters long.",
-                },
+                passwordValidation,
               })}
             />
-            {showPassword ? (
-              <BiShow
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            ) : (
-              <BiHide
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            )}
+            <button
+              className="border-0"
+              onClick={() => setShowPassword(!showPassword)}
+              onMouseUp={(e) => e.preventDefault()}
+              onMouseDown={(e) => e.preventDefault()}>
+              {showPassword ? (
+                <BiShow className="show-password position-absolute" />
+              ) : (
+                <BiHide className="show-password position-absolute" />
+              )}
+            </button>
           </div>
           {errors.password && (
             <p className=" text-danger "> {errors.password.message}</p>
@@ -140,26 +134,31 @@ export default function ResetPass() {
               placeholder="Confirm New Password"
               {...register("confirmPassword", {
                 required: true,
+                validate: (value) =>
+                  value === getValues("password") ||
+                  "The confirm Password and password fields must match.",
               })}
             />
-            {showPassword ? (
-              <BiShow
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            ) : (
-              <BiHide
-                onClick={() => setShowPassword(!showPassword)}
-                className="show-password position-absolute"
-              />
-            )}
+            <button
+              className="border-0"
+              onClick={() => setShowPassword(!showPassword)}
+              onMouseUp={(e) => e.preventDefault()}
+              onMouseDown={(e) => e.preventDefault()}>
+              {showPassword ? (
+                <BiShow className="show-password position-absolute" />
+              ) : (
+                <BiHide className="show-password position-absolute" />
+              )}
+            </button>
           </div>
-          {errors.password && (
-            <p className=" text-danger "> {errors.password.message}</p>
+          {errors.confirmPassword && (
+            <p className=" text-danger "> {errors.confirmPassword.message}</p>
           )}
 
-          <button className="w-100 form-button text-white border-0 rounded-3">
-            {isloading ? <div className="loader"></div> : "Reset Password"}
+          <button
+            disabled={isSubmitting}
+            className="w-100 form-button text-white border-0 rounded-3">
+            {isSubmitting ? <div className="loader"></div> : "Reset Password"}
           </button>
         </form>
       </div>

@@ -5,34 +5,62 @@ import AuthLayout from "./modules/Shared/components/AuthLayout/AuthLayout";
 import Register from "./modules/Authentication/component/Register/Register";
 import ResetPass from "./modules/Authentication/component/ResetPass/ResetPass";
 import RequestResetPass from "./modules/Authentication/component/RequestResetPass/RequestResetPass";
-import NotFound from "./modules/NotFound/components/NotFound";
+import NotFound from "./modules/Shared/components/NotFound/NotFound";
 import CategoriesList from "./modules/Categories/component/CategoriesList";
 import RecipesList from "./modules/Recipes/component/RecipesList";
 import UserList from "./modules/Users/components/UsersList";
 import MasterLayout from "./modules/Shared/components/MasterLayout/MasterLayout";
 import Home from "./modules/Home/components/Home";
 import { ToastContainer } from "react-toastify";
+import ProtectComponent from "./modules/Shared/components/ProtectComponent/ProtectComponent";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 function App() {
+  const [userInformation, setUserInformation] = useState(null);
+
+  const loginInformation = (response) => {
+    console.log(response);
+    localStorage.setItem("token", response.data.token);
+
+    const decoded = jwtDecode(
+      response.data.token || localStorage.getItem("token")
+    );
+    setUserInformation(decoded);
+  };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUserInformation(decoded);
+    }
+  }, []);
   const routes = createBrowserRouter([
     {
       path: "",
       element: <AuthLayout />,
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <Login /> },
-        { path: "login", element: <Login /> },
+        { index: true, element: <Login loginInformation={loginInformation} /> },
+        {
+          path: "login",
+          element: <Login loginInformation={loginInformation} />,
+        },
         { path: "register", element: <Register /> },
-        { path: "requestResetPass", element: <RequestResetPass /> },
-        { path: "resetpass", element: <ResetPass /> },
+        { path: "request-reset-passwword", element: <RequestResetPass /> },
+        { path: "reset-passwword", element: <ResetPass /> },
       ],
     },
     {
       path: "dashboard",
-      element: <MasterLayout />,
+      element: (
+        <ProtectComponent userInformation={userInformation}>
+          <MasterLayout userInformation={userInformation} />{" "}
+        </ProtectComponent>
+      ),
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <Home /> },
+        { index: true, element: <Home userInformation={userInformation} /> },
         { path: "home", element: <Home /> },
         { path: "categoriesList", element: <CategoriesList /> },
         { path: "recipes", element: <RecipesList /> },
