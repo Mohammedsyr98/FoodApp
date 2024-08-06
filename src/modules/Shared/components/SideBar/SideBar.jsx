@@ -23,6 +23,7 @@ export default function SideBar() {
         <Menu className="pt-5">
           <MenuItem className="logo mb-5">
             <img
+              className={sidebarCollaps && "collapsed"}
               onClick={() => setSidebarCollaps(!sidebarCollaps)}
               src={sidebarLogo}
             />

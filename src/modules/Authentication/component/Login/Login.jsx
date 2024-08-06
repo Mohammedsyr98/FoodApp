@@ -14,6 +14,7 @@ export default function Login({ loginInformation }) {
   const notify = (message) => toast(message);
   const [showPassword, setShowPassword] = useState(true);
   const [isloading, SetIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -45,7 +46,7 @@ export default function Login({ loginInformation }) {
         </span>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <div className="input-group mb-3">
+            <div className="input-group mb-1">
               <span className="input-group-text">
                 <IoPhonePortraitOutline />
               </span>
@@ -55,7 +56,7 @@ export default function Login({ loginInformation }) {
                 className="form-control py-2"
                 placeholder="Enter Your E-mail"
                 {...register("email", {
-                  emailValidation,
+                  ...emailValidation,
                 })}
               />
             </div>
@@ -71,13 +72,13 @@ export default function Login({ loginInformation }) {
 
           <div
             style={{ marginTop: "32px" }}
-            className="input-group mb-3 position-relative ">
+            className="input-group mb-1 position-relative ">
             <span className="input-group-text">
               <RiLockPasswordFill />
             </span>
 
             <input
-              type={showPassword ? `text` : `password`}
+              type={showPassword ? `password` : `text`}
               className="form-control py-2"
               placeholder="Enter Your Password"
               {...register("password", {
@@ -86,6 +87,7 @@ export default function Login({ loginInformation }) {
             />
             <button
               className="border-0"
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               onMouseUp={(e) => e.preventDefault()}
               onMouseDown={(e) => e.preventDefault()}>
@@ -103,14 +105,16 @@ export default function Login({ loginInformation }) {
             <Link to="register" className="text-decoration-none text-black">
               Register Now?
             </Link>
-            <Link to="request-reset-passwword" className="text-decoration-none">
+            <Link
+              to="/request-reset-passwword"
+              className="text-decoration-none">
               Forget Password?
             </Link>
           </div>
           <button
             disabled={isSubmitting}
             className="w-100 form-button text-white border-0 rounded-3">
-            {isSubmitting ? <div className="loader"></div> : "Submit"}
+            {isSubmitting ? <div className="loader"></div> : "Login"}
           </button>
         </form>
       </div>

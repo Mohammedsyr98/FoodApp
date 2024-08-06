@@ -52,7 +52,7 @@ export default function ResetPass() {
         </span>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <div className="input-group mb-3">
+            <div className="input-group mb-1">
               <span className="input-group-text">
                 <MdOutlineMailOutline />
               </span>
@@ -62,7 +62,7 @@ export default function ResetPass() {
                 className="form-control py-2"
                 placeholder="Enter Your E-mail"
                 {...register("email", {
-                  emailValidation,
+                  ...emailValidation,
                 })}
               />
             </div>
@@ -75,7 +75,7 @@ export default function ResetPass() {
               </p>
             )}
           </div>
-          <div className="input-group mt-3 mb-3 position-relative ">
+          <div className="input-group mt-3 mb-1 position-relative ">
             <span className="input-group-text">
               <RiLockPasswordFill />
             </span>
@@ -93,22 +93,23 @@ export default function ResetPass() {
             <p className=" text-danger "> This field is required</p>
           )}
 
-          <div className="input-group mt-3 mb-3 position-relative ">
+          <div className="input-group mt-3 mb-1 position-relative ">
             <span className="input-group-text">
               <RiLockPasswordFill />
             </span>
 
             <input
-              type={showPassword ? `text` : `password`}
+              type={showPassword ? `password` : `text`}
               className="form-control py-2"
               placeholder="New Password"
               {...register("password", {
                 required: true,
-                passwordValidation,
+                ...passwordValidation,
               })}
             />
             <button
               className="border-0"
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               onMouseUp={(e) => e.preventDefault()}
               onMouseDown={(e) => e.preventDefault()}>
@@ -123,13 +124,13 @@ export default function ResetPass() {
             <p className=" text-danger "> {errors.password.message}</p>
           )}
 
-          <div className="input-group mt-3 mb-3 position-relative ">
+          <div className="input-group mt-3 mb-1 position-relative ">
             <span className="input-group-text">
               <RiLockPasswordFill />
             </span>
 
             <input
-              type={showPassword ? `text` : `password`}
+              type={showPassword ? `password` : `text`}
               className="form-control py-2"
               placeholder="Confirm New Password"
               {...register("confirmPassword", {

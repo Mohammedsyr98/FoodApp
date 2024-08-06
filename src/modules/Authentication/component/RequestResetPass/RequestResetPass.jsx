@@ -40,7 +40,7 @@ export default function RequestResetPass() {
         </span>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <div className="input-group mb-5">
+            <div className="input-group mb-1">
               <span className="input-group-text">
                 <IoPhonePortraitOutline />
               </span>
@@ -51,7 +51,7 @@ export default function RequestResetPass() {
                 placeholder="Enter Your E-mail"
                 {...register("email", {
                   required: "Email Address is required",
-                  emailValidation,
+                  ...emailValidation,
                 })}
               />
             </div>

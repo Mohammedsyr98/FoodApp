@@ -72,7 +72,15 @@
   background-color: rgba(74, 163, 90, 1);
   padding: 10px 100px;
   margin-top: 1rem;
+  transition: all 0.2s ease-in-out;
   margin-bottom: 30px;
+}
+.form-button:hover {
+  background-color: rgb(61 140 75);
+}
+form .links a {
+  color: rgba(74, 163, 90, 1);
+  font-weight: 500;
 }
 
 /* Start Loading Effect */
@@ -110,7 +118,11 @@
   background-color: transparent !important;
 }
 .sidebar .ps-sidebar-container .logo img {
-  width: 50%;
+  width: 7rem;
+  transition: all 0.3s ease-in-out;
+}
+.sidebar .ps-sidebar-container .logo .collapsed {
+  width: 3rem;
 }
 .sidebar .ps-sidebar-container .logo .ps-menu-button:hover {
   background-color: transparent;
