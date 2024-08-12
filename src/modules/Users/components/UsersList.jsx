@@ -6,20 +6,14 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { TfiWorld } from "react-icons/tfi";
 import Pagination from "react-bootstrap/Pagination";
-import {
-  baseImageUrl,
-  baseUsersUrl,
-  categoriesUrls,
-  UsersUrls,
-  usersUrls,
-} from "../../../constants/EndPoints";
+import { baseImageUrl, UsersUrls } from "../../../constants/EndPoints";
 import { FaRegUser } from "react-icons/fa";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import ConfirmModal from "../../Shared/components/ConfirmModal/ConfirmModal";
-import AddModal from "../../Shared/components/AddModal/AddModal";
+
 import axios from "axios";
 import { toast } from "react-toastify";
 import NoData from "../../Shared/components/NoData/NoData";
