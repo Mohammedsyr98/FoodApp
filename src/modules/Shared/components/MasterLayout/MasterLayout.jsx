@@ -18,7 +18,7 @@ export default function MasterLayout({ userInformation }) {
           dropdownOpenned={dropdownOpenned}
           userInformation={userInformation}
         />
-        <div className="px-3" style={{ height: "100vh" }}>
+        <div className="px-3" style={{ minHeight: "100vh" }}>
           <Outlet />
         </div>
       </div>
