@@ -16,6 +16,10 @@ import ProtectComponent from "./modules/Shared/components/ProtectComponent/Prote
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import AddRecipe from "./modules/Add Recipe/AddRecipe";
+import { GetAllCategoriesProvider } from "./contexts/getAllCategories";
+import { GetAllTagsProvider } from "./contexts/getAllTags";
+import { PaginationProvider } from "./contexts/Pagination";
+import Verify from "./modules/Authentication/component/VerifyAccount/Verify";
 
 function App() {
   const [userInformation, setUserInformation] = useState(null);
@@ -50,6 +54,7 @@ function App() {
         { path: "register", element: <Register /> },
         { path: "request-reset-passwword", element: <RequestResetPass /> },
         { path: "reset-passwword", element: <ResetPass /> },
+        { path: "verify", element: <Verify /> },
       ],
     },
     {
@@ -63,16 +68,55 @@ function App() {
       children: [
         { index: true, element: <Home userInformation={userInformation} /> },
         { path: "home", element: <Home /> },
-        { path: "categoriesList", element: <CategoriesList /> },
-        { path: "recipes", element: <RecipesList /> },
-        { path: "users", element: <UserList /> },
-        { path: "add-recipe", element: <AddRecipe /> },
+        {
+          path: "categoriesList",
+          element: (
+            <PaginationProvider>
+              <GetAllCategoriesProvider>
+                <CategoriesList />
+              </GetAllCategoriesProvider>
+            </PaginationProvider>
+          ),
+        },
+        {
+          path: "recipes",
+          element: (
+            <PaginationProvider>
+              <GetAllCategoriesProvider>
+                <GetAllTagsProvider>
+                  <RecipesList />
+                </GetAllTagsProvider>{" "}
+              </GetAllCategoriesProvider>
+            </PaginationProvider>
+          ),
+        },
+        {
+          path: "users",
+          element: (
+            <PaginationProvider>
+              <UserList />
+            </PaginationProvider>
+          ),
+        },
+        {
+          path: "add-recipe",
+          element: (
+            <PaginationProvider>
+              <GetAllCategoriesProvider>
+                <GetAllTagsProvider>
+                  <AddRecipe />
+                </GetAllTagsProvider>
+              </GetAllCategoriesProvider>
+            </PaginationProvider>
+          ),
+        },
       ],
     },
   ]);
   return (
     <>
       <ToastContainer theme="colored" />
+
       <RouterProvider router={routes} />
     </>
   );

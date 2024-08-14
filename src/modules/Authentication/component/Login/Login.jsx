@@ -102,7 +102,7 @@ export default function Login({ loginInformation }) {
             <p className=" text-danger "> This field is required</p>
           )}
           <div className="links d-flex justify-content-between ">
-            <Link to="register" className="text-decoration-none text-black">
+            <Link to="/register" className="text-decoration-none text-black">
               Register Now?
             </Link>
             <Link

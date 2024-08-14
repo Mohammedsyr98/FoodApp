@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../../Shared/components/Header/Header";
 import headerPhoto2 from "../../../assets/headerPhoto-2.png";
 import Table from "react-bootstrap/Table";
@@ -13,10 +13,12 @@ import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import ConfirmModal from "../../Shared/components/ConfirmModal/ConfirmModal";
-
+import { FaRegUserCircle } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NoData from "../../Shared/components/NoData/NoData";
+import { paginationContext } from "../../../contexts/Pagination";
+import ViewModal from "../../Shared/components/ViewModal/ViewModal";
 export default function UsersList() {
   const notify = (message) => toast(message);
   const [usersList, setUserList] = useState([]);
@@ -30,8 +32,19 @@ export default function UsersList() {
     email: "",
     country: "",
   });
-  const [pageNumbers, setPageNumbers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [showUserViewModal, setShowUserViewModal] = useState(false);
+  const [userDetails, setUserDetails] = useState([]);
+  const handleCloseShowViewModal = () => setShowUserViewModal(false);
+  const handleShowUserViewModal = () => setShowUserViewModal(true);
+  // const [pageNumbers, setPageNumbers] = useState([]);
+  // const [currentPage, setCurrentPage] = useState(1);
+  const {
+    pageNumbers,
+    currentPage,
+    setPageNumbers,
+    handlePageChange,
+    renderPaginationItems,
+  } = useContext(paginationContext);
   const getUsersList = async (pageSize = 4, pageNumber = 1) => {
     try {
       let response = await axios.get(UsersUrls.getUsers, {
@@ -44,7 +57,7 @@ export default function UsersList() {
           pageNumber,
         },
       });
-      console.log(response.data.totalNumberOfPages);
+      console.log(response.data);
       const pages = Array.from(
         { length: response.data.totalNumberOfPages },
         (_, i) => i + 1
@@ -57,35 +70,35 @@ export default function UsersList() {
       console.log(error);
     }
   };
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    getUsersList(4, page);
-  };
-  const renderPaginationItems = () => {
-    const totalPages = pageNumbers.length;
-    const visiblePages = 5;
+  // const handlePageChange = (page) => {
+  //   setCurrentPage(page);
+  //   getUsersList(4, page);
+  // };
+  // const renderPaginationItems = () => {
+  //   const totalPages = pageNumbers.length;
+  //   const visiblePages = 5;
 
-    let startPage = Math.max(currentPage - 2, 1);
-    let endPage = Math.min(startPage + visiblePages - 1, totalPages);
+  //   let startPage = Math.max(currentPage - 2, 1);
+  //   let endPage = Math.min(startPage + visiblePages - 1, totalPages);
 
-    if (endPage - startPage < visiblePages - 1) {
-      startPage = Math.max(endPage - visiblePages + 1, 1);
-    }
+  //   if (endPage - startPage < visiblePages - 1) {
+  //     startPage = Math.max(endPage - visiblePages + 1, 1);
+  //   }
 
-    const pages = [];
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <Pagination.Item
-          key={i}
-          active={currentPage === i}
-          onClick={() => handlePageChange(i)}>
-          {i}
-        </Pagination.Item>
-      );
-    }
+  //   const pages = [];
+  //   for (let i = startPage; i <= endPage; i++) {
+  //     pages.push(
+  //       <Pagination.Item
+  //         key={i}
+  //         active={currentPage === i}
+  //         onClick={() => handlePageChange(i)}>
+  //         {i}
+  //       </Pagination.Item>
+  //     );
+  //   }
 
-    return pages;
-  };
+  //   return pages;
+  // };
 
   const deleteSelectedValue = async (id) => {
     console.log(id);
@@ -173,7 +186,7 @@ export default function UsersList() {
         </div>
       </div>
       {isloading ? (
-        <div className="loader"></div>
+        <div className="loader-table loader"></div>
       ) : usersList.length === 0 ? (
         <NoData />
       ) : (
@@ -203,7 +216,7 @@ export default function UsersList() {
                         src={`${baseImageUrl}/${user.imagePath}`}
                       />
                     ) : (
-                      "No image"
+                      <FaRegUserCircle className="anony-user" />
                     )}
                   </td>
                   <td>{user.country}</td>
@@ -219,17 +232,25 @@ export default function UsersList() {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item className="d-flex align-items-center">
+                        <Dropdown.Item
+                          className="d-flex align-items-center"
+                          onClick={() => {
+                            handleShowUserViewModal();
+                            setUserDetails(user);
+                          }}>
                           <FaEye className="icon" /> View
                         </Dropdown.Item>
-                        <Dropdown.Item className="d-flex align-items-center">
-                          <FaEdit className="icon" /> Edit
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={handleShow}
-                          className="d-flex align-items-center">
-                          <MdDeleteOutline className="icon" /> Delete
-                        </Dropdown.Item>
+
+                        {console.log(user.group.name)}
+                        {user.group.name !== "SuperAdmin" ? (
+                          <Dropdown.Item
+                            onClick={handleShow}
+                            className="d-flex align-items-center">
+                            <MdDeleteOutline className="icon" /> Delete
+                          </Dropdown.Item>
+                        ) : (
+                          ""
+                        )}
                       </Dropdown.Menu>
                     </Dropdown>
                   </td>
@@ -238,18 +259,25 @@ export default function UsersList() {
             </tbody>
           </Table>
           <Pagination>
-            <Pagination.First onClick={() => handlePageChange(1)} />
-            <Pagination.Prev
-              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            <Pagination.First
+              onClick={() => handlePageChange(1, getUsersList)}
             />
-            {renderPaginationItems()}
+            <Pagination.Prev
+              onClick={() =>
+                handlePageChange(Math.max(currentPage - 1, 1), getUsersList)
+              }
+            />
+            {renderPaginationItems(getUsersList)}
             <Pagination.Next
               onClick={() =>
-                handlePageChange(Math.min(currentPage + 1, pageNumbers.length))
+                handlePageChange(
+                  Math.min(currentPage + 1, pageNumbers.length),
+                  getUsersList
+                )
               }
             />
             <Pagination.Last
-              onClick={() => handlePageChange(pageNumbers.length)}
+              onClick={() => handlePageChange(pageNumbers.length, getUsersList)}
             />
           </Pagination>
         </>
@@ -260,6 +288,12 @@ export default function UsersList() {
         deleteSelectedValue={deleteSelectedValue}
         show={show}
         item={"User"}
+      />
+      <ViewModal
+        handleCloseShowViewModal={handleCloseShowViewModal}
+        showUserViewModal={showUserViewModal}
+        handleShowUserViewModal={handleShowUserViewModal}
+        userDetails={userDetails}
       />
     </div>
   );

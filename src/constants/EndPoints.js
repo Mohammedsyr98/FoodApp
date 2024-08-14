@@ -6,6 +6,7 @@ export const usersUrls = {
   login: `${baseUsers}/Login`,
   register: `${baseUsers}/Register`,
   delete: (id) => `${baseUsers}/${id}`,
+  verify: `${baseUsers}/verify`,
   resetRequest: `${baseUsers}/Reset/Request`,
   reset: `${baseUsers}/Reset`,
 };
@@ -28,3 +29,5 @@ export const UsersUrls = {
   delete: (id) => `${baseUsersUrl}/${id}`,
 };
 export const baseImageUrl = "https://upskilling-egypt.com:3006";
+
+export const getTags = `${url}/tag`;

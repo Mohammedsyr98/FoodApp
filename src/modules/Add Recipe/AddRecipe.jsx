@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FileUploader } from "react-drag-drop-files";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { resipesUrls } from "../../constants/EndPoints";
+import { getTags, resipesUrls } from "../../constants/EndPoints";
+import { useNavigate } from "react-router-dom";
+import { getAllCategoriesContext } from "../../contexts/getAllCategories";
+import { getAllTagsContext } from "../../contexts/getAllTags";
+import { paginationContext } from "../../contexts/Pagination";
 export default function AddRecipe() {
   const fileTypes = ["JPG", "PNG", "GIF"];
-
+  // const [tags, setTags] = useState([]);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,11 +20,44 @@ export default function AddRecipe() {
     formState: { errors, isSubmitting },
   } = useForm();
   const notify = (message) => toast(message);
-  const handleChange = (file) => {
-    setValue("photo", file);
-  };
 
+  const handleChange = (file) => {
+    setValue("recipeImage", file);
+  };
+  const {
+    pageNumbers,
+    currentPage,
+    setPageNumbers,
+    handlePageChange,
+    renderPaginationItems,
+  } = useContext(paginationContext);
+  const {
+    allCategories,
+    isLoading,
+    getCategoryList,
+    setIsLoading,
+    setFiltrationSearch,
+  } = useContext(getAllCategoriesContext);
+  const { tags } = useContext(getAllTagsContext);
+  // const getAllTags = async (data) => {
+  //   try {
+  //     let response = await axios.get(getTags, {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //     });
+
+  //     setTags(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   tags();
+  //   getCategoryList();
+  // }, []);
   const onSubmit = async (data) => {
+    setIsLoading(true);
     console.log(data);
     const formData = new FormData();
     formData.append("name", data.name);
@@ -27,7 +65,8 @@ export default function AddRecipe() {
     formData.append("price", data.price);
     formData.append("categoriesIds", data.categoriesIds);
     formData.append("description", data.description);
-    formData.append("photo", data.photo[0]);
+    formData.append("recipeImage", data.recipeImage ? data.recipeImage : "");
+    console.log(data.recipeImage);
     try {
       let response = await axios.post(resipesUrls.getRecipes, formData, {
         headers: {
@@ -35,14 +74,17 @@ export default function AddRecipe() {
         },
       });
       console.log(response);
-
+      setIsLoading(false);
       toast.success(response.data.message);
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
-
-      //   toast.error(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
+  useEffect(() => {
+    getCategoryList(99999999999, 1);
+  }, [isLoading]);
   return (
     <div className="add-recipe">
       <div className="background">
@@ -57,7 +99,11 @@ export default function AddRecipe() {
               click here and sill it with the table !
             </span>
           </div>
-          <button className="all-recipe-button">All Recipes</button>
+          <button
+            onClick={() => navigate("/dashboard/recipes")}
+            className="all-recipe-button">
+            All Recipes
+          </button>
         </div>
       </div>
       <form>
@@ -86,9 +132,15 @@ export default function AddRecipe() {
             <option value="" disabled selected>
               Select tag
             </option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            {tags.length > 0 ? (
+              tags.map((tag, i) => (
+                <option key={i} value={i + 1}>
+                  {tag.name}
+                </option>
+              ))
+            ) : (
+              <option disabled>...Loading</option>
+            )}
           </select>
           <div className="mb-3">
             {errors.tag && <p className="text-danger ">{errors.tag.message}</p>}
@@ -110,7 +162,7 @@ export default function AddRecipe() {
             )}
           </div>
           <select
-            className="form-select  form-control "
+            className="form-select  form-control"
             aria-label="Default select example"
             {...register("categoriesIds", {
               required: "Category Is Required",
@@ -118,9 +170,15 @@ export default function AddRecipe() {
             <option value="" disabled selected>
               Select Category
             </option>
-            <option value="1">cat1</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            {allCategories.length > 0 ? (
+              allCategories.map((cat, i) => (
+                <option key={i} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))
+            ) : (
+              <option disabled>...Loading</option>
+            )}
           </select>
           <div className="mb-3">
             {errors.category && (
@@ -152,9 +210,16 @@ export default function AddRecipe() {
         </div>
       </form>
       <div className="buttons text-end">
-        <button className="cancel">Cancel</button>
-        <button onClick={handleSubmit(onSubmit)} className="save">
-          Save
+        <button
+          onClick={() => navigate("/dashboard/recipes")}
+          className="cancel">
+          Cancel
+        </button>
+        <button
+          disabled={isLoading}
+          onClick={handleSubmit(onSubmit)}
+          className="save">
+          {isLoading ? <div className="loader"></div> : "Save"}
         </button>
       </div>
     </div>

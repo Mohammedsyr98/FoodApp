@@ -1,3 +1,37 @@
+/* start home */
+.home .background {
+  background-color: rgb(240, 255, 239);
+  padding: 10px 64px;
+  margin-top: 22px;
+}
+.home .title {
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.home .des {
+  font-size: 18px;
+}
+.home .text {
+  flex: 1;
+}
+.home .text .green-title {
+  color: rgba(74, 163, 90, 1);
+}
+.home .all-recipe-button {
+  background-color: rgba(74, 163, 90, 1);
+  color: white;
+  border: 0;
+  height: max-content;
+  padding: 13px 57px;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+.home .all-recipe-button:hover {
+  background-color: rgb(61 140 75);
+}
+/* end home */
 /* Start Background for form */
 .form-box {
   padding-bottom: 3px !important;
@@ -264,16 +298,24 @@ table {
 
   color: rgba(74, 163, 90, 1);
 }
-.loader {
-  position: absolute;
-  margin-top: 25%;
-  margin-left: 40%;
+.loader-table {
+  position: absolute !important;
+  margin-top: 10% !important;
+  margin-left: 40% !important;
 }
 /* end categories */
 /* Start Recipes */
 
 .recipe-photo {
   width: 60px;
+}
+.recipes-list .search .input-group {
+  width: 33.3%;
+}
+@media (max-width: 992px) {
+  .recipes-list .search .input-group {
+    width: 100%;
+  }
 }
 /* End Recipes */
 /* Start Confirm */
@@ -406,12 +448,12 @@ table {
 .add-recipe .buttons button:nth-child(2):hover {
   background-color: rgb(61 140 75);
 }
-.add-recipe .uploader {
+.uploader {
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
 }
-.add-recipe .uploader label {
+.uploader label {
   width: 100% !important;
   max-width: 100%;
   display: flex;
@@ -421,11 +463,14 @@ table {
   border: 2px dashed rgba(74, 163, 90, 1);
   cursor: pointer;
 }
-.add-recipe .uploader label svg {
+.register .uploader label {
+  padding: 8px;
+}
+.uploader label svg {
   display: none;
   color: rgba(74, 163, 90, 1) !important;
 }
-.add-recipe .uploader label::before {
+.uploader label::before {
   content: url("../src/assets/upload.png");
   display: block;
   width: 30px;
@@ -433,10 +478,13 @@ table {
 
   margin: 0 auto;
 }
-.add-recipe .uploader .green-title {
+.uploader .green-title {
   color: rgba(74, 163, 90, 1);
 }
-
+.loader {
+  width: 18px;
+  height: 18px;
+}
 /* End recipe */
 
 /* Start User List */
@@ -463,6 +511,9 @@ table {
 .pagination {
   justify-content: flex-end;
 }
+.anony-user {
+  font-size: 20px;
+}
 /* End User List */
 
 /* Start No Data */
@@ -477,3 +528,14 @@ table {
 }
 
 /* End No Data */
+
+/* Start View Modal */
+.user-details-content .title {
+  margin-left: 35px;
+  margin-right: 35px;
+  margin-top: 10px;
+}
+.user-details-content .head {
+  font-weight: 600;
+}
+/* End View Modal */
