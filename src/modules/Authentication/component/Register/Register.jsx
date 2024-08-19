@@ -30,7 +30,7 @@ export default function Register() {
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     SetIsLoading(true);
-    console.log(data.confirmPassword);
+    data.confirmPassword;
     const formData = new FormData();
     formData.append("userName", data.userName);
     formData.append("email", data.email);
@@ -42,13 +42,13 @@ export default function Register() {
 
     try {
       let response = await axios.post(usersUrls.register, formData);
-      console.log(response);
+      response;
       SetIsLoading(false);
       navigate("/verify");
       toast.success(response.data.message);
     } catch (error) {
       SetIsLoading(false);
-      console.log(error);
+      error;
       toast.error(error.response.data.message);
     }
   };

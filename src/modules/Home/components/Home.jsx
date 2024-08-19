@@ -3,14 +3,15 @@ import React from "react";
 import Header from "../../Shared/components/Header/Header";
 import headerPhoto from "../../../assets/headerPhoto-1.png";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export default function Home({ userInformation }) {
   const navigate = useNavigate();
-  console.log(userInformation ? userInformation : "");
+  const UserInformation = jwtDecode(localStorage.getItem("token"));
   return (
     <div className="home">
       <Header
-        tite={"Welcome Upskilling!"}
+        tite={`Welcome ${UserInformation.userName}`}
         desc={
           "This is a welcoming screen for the entry of the application , you can now see the options"
         }

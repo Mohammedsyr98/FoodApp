@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  createHashRouter,
+} from "react-router-dom";
 import "./App.css";
 import Login from "./modules/Authentication/component/Login/Login";
 import AuthLayout from "./modules/Shared/components/AuthLayout/AuthLayout";
@@ -20,12 +24,15 @@ import { GetAllCategoriesProvider } from "./contexts/getAllCategories";
 import { GetAllTagsProvider } from "./contexts/getAllTags";
 import { PaginationProvider } from "./contexts/Pagination";
 import Verify from "./modules/Authentication/component/VerifyAccount/Verify";
+import EditRecipe from "./modules/Recipes/component/EditRecipeModal/EditRecipeModal";
+import { GetRecipeInformationProvider } from "./contexts/EditRecipeContext";
+import { GetFavoriRecipesProvider } from "./contexts/FavoriRecipes";
+import Favorites from "./modules/Favorites/Favorites";
 
 function App() {
   const [userInformation, setUserInformation] = useState(null);
 
   const loginInformation = (response) => {
-    console.log(response);
     localStorage.setItem("token", response.data.token);
 
     const decoded = jwtDecode(
@@ -40,7 +47,7 @@ function App() {
       setUserInformation(decoded);
     }
   }, []);
-  const routes = createBrowserRouter([
+  const routes = createHashRouter([
     {
       path: "",
       element: <AuthLayout />,
@@ -84,7 +91,11 @@ function App() {
             <PaginationProvider>
               <GetAllCategoriesProvider>
                 <GetAllTagsProvider>
-                  <RecipesList />
+                  <GetRecipeInformationProvider>
+                    <GetFavoriRecipesProvider>
+                      <RecipesList />
+                    </GetFavoriRecipesProvider>
+                  </GetRecipeInformationProvider>
                 </GetAllTagsProvider>{" "}
               </GetAllCategoriesProvider>
             </PaginationProvider>
@@ -108,6 +119,28 @@ function App() {
                 </GetAllTagsProvider>
               </GetAllCategoriesProvider>
             </PaginationProvider>
+          ),
+        },
+        {
+          path: "edit-recipe",
+          element: (
+            <PaginationProvider>
+              <GetAllCategoriesProvider>
+                <GetAllTagsProvider>
+                  <GetRecipeInformationProvider>
+                    <EditRecipe />
+                  </GetRecipeInformationProvider>
+                </GetAllTagsProvider>
+              </GetAllCategoriesProvider>
+            </PaginationProvider>
+          ),
+        },
+        {
+          path: "favorites",
+          element: (
+            <GetFavoriRecipesProvider>
+              <Favorites />
+            </GetFavoriRecipesProvider>
           ),
         },
       ],

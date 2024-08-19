@@ -13,12 +13,16 @@ import { IoMdList } from "react-icons/io";
 import ConfirmModal from "../../Shared/components/ConfirmModal/ConfirmModal";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAllTagsContext } from "../../../contexts/getAllTags";
 import { getAllCategoriesContext } from "../../../contexts/getAllCategories";
 import { paginationContext } from "../../../contexts/Pagination";
 import { Pagination } from "react-bootstrap";
 import NoData from "../../Shared/components/NoData/NoData";
+import ViewRecipeModal from "./ShowRecipeModal/ViewRecipeModal";
+import { getRecipeInformationContext } from "../../../contexts/EditRecipeContext";
+
+import { jwtDecode } from "jwt-decode";
 export default function RecipesList() {
   const notify = (message) => toast(message);
   const navigate = useNavigate();
@@ -29,33 +33,41 @@ export default function RecipesList() {
     categoryId: "",
   });
   const [show, setShow] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selecetedCategory, setSelectedCategory] = useState(null);
+
   const [isloading, SetIsLoading] = useState(true);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleCloseViewModal = () => setShowViewModal(false);
+  const handleShowViewModal = () => setShowViewModal(true);
   const { tags } = useContext(getAllTagsContext);
-  const {
-    allCategories,
-    setPageSize,
-    pagesize,
-    isLoading,
-    getCategoryList,
-    allCategoriesForFilter,
-    getAllCategoriesForFilter,
-    setIsLoading,
-  } = useContext(getAllCategoriesContext);
+  const { allCategoriesForFilter, getAllCategoriesForFilter } = useContext(
+    getAllCategoriesContext
+  );
+  const UserInformation = jwtDecode(localStorage.getItem("token"));
   const {
     pageNumbers,
     currentPage,
     setPageNumbers,
-
+    setCurrentPage,
     handlePageChange,
     renderPaginationItems,
   } = useContext(paginationContext);
-
+  const { setSelectedRecipe } = useContext(getRecipeInformationContext);
+  let [searchParams, setSearchParams] = useSearchParams();
+  const handleFilterChange = (filterType, value) => {
+    setFiltrationSearch({
+      ...filtrationSearch,
+      [filterType]: value,
+    });
+    filtrationSearch;
+    searchParams.set(filterType, value);
+    setSearchParams(searchParams);
+  };
   const getRecipesList = async (pageSize = 4, pageNumber = 1) => {
     try {
-      console.log(pageSize);
+      pageSize;
 
       let response = await axios.get(resipesUrls.getRecipes, {
         headers: {
@@ -67,7 +79,7 @@ export default function RecipesList() {
           pageNumber,
         },
       });
-      console.log(response.data.data);
+      response.data.data;
       const pages = Array.from(
         { length: response.data.totalNumberOfPages },
         (_, i) => i + 1
@@ -78,11 +90,13 @@ export default function RecipesList() {
 
       SetIsLoading(false);
     } catch (error) {
-      console.log(error);
+      error;
     }
   };
+  const pages = renderPaginationItems(getRecipesList);
+  const totalPages = pageNumbers.length;
   const deleteSelectedValue = async (id) => {
-    console.log(id);
+    id;
     SetIsLoading(true);
     try {
       let response = await axios.delete(resipesUrls.delete(id), {
@@ -94,7 +108,7 @@ export default function RecipesList() {
 
       toast.success("Item deleted successfully");
     } catch (error) {
-      console.log(error);
+      error;
       SetIsLoading(false);
     }
   };
@@ -104,8 +118,10 @@ export default function RecipesList() {
   useEffect(() => {
     getAllCategoriesForFilter();
   }, []);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, []);
 
-  console.log(allCategoriesForFilter);
   return (
     <div className="recipes-list">
       <div>
@@ -116,18 +132,23 @@ export default function RecipesList() {
           }
           photo={headerPhoto2}
         />
-        <div className="head d-flex justify-content-between">
-          {" "}
-          <div className="d-flex flex-column">
-            <span>Recipe Table Details</span>
-            <span>You can check all details</span>
+        {UserInformation.userGroup === "SuperAdmin" ? (
+          <div className="head d-flex justify-content-between">
+            {" "}
+            <div className="d-flex flex-column">
+              <span>Recipe Table Details</span>
+              <span>You can check all details</span>
+            </div>
+            <button
+              onClick={() => navigate("/dashboard/add-recipe")}
+              className="new-category-button">
+              Add New Item
+            </button>
           </div>
-          <button
-            onClick={() => navigate("/dashboard/add-recipe")}
-            className="new-category-button">
-            Add New Item
-          </button>
-        </div>
+        ) : (
+          ""
+        )}
+
         <div className="search row mt-5">
           <div className="input-group mb-1 col-12 col-md-4">
             <span className="input-group-text">
@@ -138,11 +159,9 @@ export default function RecipesList() {
               type="text"
               className="form-control py-2"
               placeholder="Recipe Name"
+              value={searchParams.get("name")}
               onChange={(e) => {
-                setFiltrationSearch({
-                  ...filtrationSearch,
-                  name: e.target.value,
-                });
+                handleFilterChange("name", e.target.value);
               }}
             />
           </div>
@@ -154,18 +173,18 @@ export default function RecipesList() {
             <select
               className="form-select form-control"
               aria-label="Default select example"
-              onChange={(e) =>
-                setFiltrationSearch({
-                  ...filtrationSearch,
-                  tagId: e.target.value,
-                })
-              }>
+              onChange={(e) => {
+                handleFilterChange("tagId", e.target.value);
+              }}>
               <option value="" selected>
                 All tags
               </option>
               {tags.length > 0 ? (
                 tags.map((tag, i) => (
-                  <option key={i} value={i + 1}>
+                  <option
+                    key={i}
+                    selected={searchParams.get("tagId")}
+                    value={i + 1}>
                     {tag.name}
                   </option>
                 ))
@@ -182,18 +201,18 @@ export default function RecipesList() {
             <select
               className="form-select  form-control "
               aria-label="Default select example"
-              onChange={(e) =>
-                setFiltrationSearch({
-                  ...filtrationSearch,
-                  categoryId: e.target.value,
-                })
-              }>
+              onChange={(e) => {
+                handleFilterChange("categoryId", e.target.value);
+              }}>
               <option value="" selected>
                 All Categories
               </option>
               {allCategoriesForFilter.length > 0 ? (
                 allCategoriesForFilter.map((cat, i) => (
-                  <option key={i} value={cat.id}>
+                  <option
+                    key={i}
+                    selected={searchParams.get("categoryId")}
+                    value={cat.id}>
                     {cat.name}
                   </option>
                 ))
@@ -258,17 +277,37 @@ export default function RecipesList() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                          <Dropdown.Item className="d-flex align-items-center">
+                          <Dropdown.Item
+                            onClick={() => {
+                              setSelectedRecipe(recipe);
+                              setShowViewModal(true);
+                            }}
+                            className="d-flex align-items-center">
                             <FaEye className="icon" /> View
                           </Dropdown.Item>
-                          <Dropdown.Item className="d-flex align-items-center">
-                            <FaEdit className="icon" /> Edit
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            onClick={handleShow}
-                            className="d-flex align-items-center">
-                            <MdDeleteOutline className="icon" /> Delete
-                          </Dropdown.Item>
+                          {UserInformation.userGroup === "SuperAdmin" ? (
+                            <>
+                              {" "}
+                              <Dropdown.Item
+                                className="d-flex align-items-center"
+                                onClick={() => {
+                                  setSelectedRecipe(recipe);
+
+                                  navigate(
+                                    `/dashboard/edit-recipe?id=${recipe.id}`
+                                  );
+                                }}>
+                                <FaEdit className="icon" /> Edit
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                onClick={handleShow}
+                                className="d-flex align-items-center">
+                                <MdDeleteOutline className="icon" /> Delete
+                              </Dropdown.Item>
+                            </>
+                          ) : (
+                            ""
+                          )}
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>
@@ -280,13 +319,15 @@ export default function RecipesList() {
             <Pagination>
               <Pagination.First
                 onClick={() => handlePageChange(1, getRecipesList)}
+                disabled={currentPage === 1}
               />
               <Pagination.Prev
                 onClick={() =>
                   handlePageChange(Math.max(currentPage - 1, 1), getRecipesList)
                 }
+                disabled={currentPage === 1}
               />
-              {renderPaginationItems(getRecipesList)}
+              {pages}
               <Pagination.Next
                 onClick={() =>
                   handlePageChange(
@@ -294,11 +335,13 @@ export default function RecipesList() {
                     getRecipesList
                   )
                 }
+                disabled={currentPage === totalPages}
               />
               <Pagination.Last
                 onClick={() =>
                   handlePageChange(pageNumbers.length, getRecipesList)
                 }
+                disabled={currentPage === totalPages}
               />
             </Pagination>
           </>
@@ -310,6 +353,12 @@ export default function RecipesList() {
           show={show}
           item={"Recipe"}
         />
+        {showViewModal && (
+          <ViewRecipeModal
+            handleCloseViewModal={handleCloseViewModal}
+            showViewModal={showViewModal}
+          />
+        )}
       </div>
     </div>
   );

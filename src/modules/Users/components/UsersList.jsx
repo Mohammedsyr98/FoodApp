@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import Header from "../../Shared/components/Header/Header";
 import headerPhoto2 from "../../../assets/headerPhoto-2.png";
 import Table from "react-bootstrap/Table";
@@ -18,7 +18,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import NoData from "../../Shared/components/NoData/NoData";
 import { paginationContext } from "../../../contexts/Pagination";
-import ViewModal from "../../Shared/components/ViewModal/ViewModal";
+import ViewModal from "./ViewUserModal/ViewUserModal";
+import { useSearchParams } from "react-router-dom";
 export default function UsersList() {
   const notify = (message) => toast(message);
   const [usersList, setUserList] = useState([]);
@@ -27,24 +28,38 @@ export default function UsersList() {
   const [isloading, SetIsLoading] = useState(true);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  let [searchParams, setSearchParams] = useSearchParams();
   const [filtrationSearch, setFiltrationSearch] = useState({
-    userName: "",
-    email: "",
-    country: "",
+    userName: searchParams.get("userName") || "",
+    email: searchParams.get("email") || "",
+    country: searchParams.get("country") || "",
+    groups: searchParams.get("groups") || "",
   });
+
+  const handleFilterChange = (filterType, value) => {
+    setFiltrationSearch({
+      ...filtrationSearch,
+      [filterType]: value,
+    });
+    filterType, value;
+    searchParams.set(filterType, value);
+    setSearchParams(searchParams);
+  };
+
   const [showUserViewModal, setShowUserViewModal] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
   const handleCloseShowViewModal = () => setShowUserViewModal(false);
   const handleShowUserViewModal = () => setShowUserViewModal(true);
-  // const [pageNumbers, setPageNumbers] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
+
   const {
     pageNumbers,
     currentPage,
     setPageNumbers,
     handlePageChange,
     renderPaginationItems,
+    setCurrentPage,
   } = useContext(paginationContext);
+
   const getUsersList = async (pageSize = 4, pageNumber = 1) => {
     try {
       let response = await axios.get(UsersUrls.getUsers, {
@@ -57,19 +72,20 @@ export default function UsersList() {
           pageNumber,
         },
       });
-      console.log(response.data);
+      response.data;
       const pages = Array.from(
         { length: response.data.totalNumberOfPages },
         (_, i) => i + 1
       );
       setPageNumbers(pages);
       setUserList(response.data.data);
-      console.log(pages);
+      pages;
       SetIsLoading(false);
     } catch (error) {
-      console.log(error);
+      error;
     }
   };
+  const totalPages = pageNumbers.length;
   // const handlePageChange = (page) => {
   //   setCurrentPage(page);
   //   getUsersList(4, page);
@@ -101,7 +117,7 @@ export default function UsersList() {
   // };
 
   const deleteSelectedValue = async (id) => {
-    console.log(id);
+    id;
     SetIsLoading(true);
     try {
       let response = await axios.delete(UsersUrls.delete(id), {
@@ -113,7 +129,7 @@ export default function UsersList() {
 
       toast.success("Item deleted successfully");
     } catch (error) {
-      console.log(error);
+      error;
       toast.error(error.response.data.message);
       SetIsLoading(false);
     }
@@ -121,7 +137,9 @@ export default function UsersList() {
   useEffect(() => {
     getUsersList();
   }, [filtrationSearch]);
-
+  useEffect(() => {
+    setCurrentPage(1);
+  }, []);
   return (
     <div className="users-list">
       {" "}
@@ -133,7 +151,7 @@ export default function UsersList() {
         photo={headerPhoto2}
       />
       <div className="search row mt-5">
-        <div className="input-group mb-1 col-12 col-md-4">
+        <div className="input-group mb-1">
           <span className="input-group-text">
             <FaRegUser />
           </span>
@@ -142,15 +160,13 @@ export default function UsersList() {
             type="text"
             className="form-control py-2"
             placeholder="User Name"
+            value={searchParams.get("userName")}
             onChange={(e) => {
-              setFiltrationSearch({
-                ...filtrationSearch,
-                userName: e.target.value,
-              });
+              handleFilterChange("userName", e.target.value);
             }}
           />
         </div>
-        <div className="input-group mb-1 col-12 col-md-4">
+        <div className="input-group mb-1">
           <span className="input-group-text">
             <MdOutlineMailOutline />
           </span>
@@ -159,15 +175,13 @@ export default function UsersList() {
             type="text"
             className="form-control py-2"
             placeholder="Email"
+            value={searchParams.get("email")}
             onChange={(e) => {
-              setFiltrationSearch({
-                ...filtrationSearch,
-                email: e.target.value,
-              });
+              handleFilterChange("email", e.target.value);
             }}
           />
         </div>
-        <div className="input-group mb-1 col-12 col-md-4">
+        <div className="input-group mb-1">
           <span className="input-group-text">
             <TfiWorld />
           </span>
@@ -176,13 +190,31 @@ export default function UsersList() {
             type="text"
             className="form-control py-2"
             placeholder="Country"
+            value={searchParams.get("country")}
             onChange={(e) => {
-              setFiltrationSearch({
-                ...filtrationSearch,
-                country: e.target.value,
-              });
+              handleFilterChange("country", e.target.value);
             }}
           />
+        </div>
+        <div className="input-group mb-1">
+          <select
+            className="form-select form-control"
+            aria-label="Default select example"
+            value={searchParams.get("groups") || ""}
+            onChange={(e) =>
+              handleFilterChange(
+                "groups",
+                e.target.value.length > 0 ? [e.target.value] : ""
+              )
+            }>
+            <option value="">All users</option>
+            <option value="1" selected={searchParams.get("groups")}>
+              Adimn
+            </option>
+            <option value="2" selected={searchParams.get("groups")}>
+              User
+            </option>
+          </select>
         </div>
       </div>
       {isloading ? (
@@ -213,6 +245,7 @@ export default function UsersList() {
                     {user.imagePath ? (
                       <img
                         className="recipe-photo"
+                        data-mdb-img="https://mdbcdn.b-cdn.net/img/Photos/Slides/1.webp"
                         src={`${baseImageUrl}/${user.imagePath}`}
                       />
                     ) : (
@@ -241,7 +274,6 @@ export default function UsersList() {
                           <FaEye className="icon" /> View
                         </Dropdown.Item>
 
-                        {console.log(user.group.name)}
                         {user.group.name !== "SuperAdmin" ? (
                           <Dropdown.Item
                             onClick={handleShow}
@@ -261,11 +293,13 @@ export default function UsersList() {
           <Pagination>
             <Pagination.First
               onClick={() => handlePageChange(1, getUsersList)}
+              disabled={currentPage === 1}
             />
             <Pagination.Prev
               onClick={() =>
                 handlePageChange(Math.max(currentPage - 1, 1), getUsersList)
               }
+              disabled={currentPage === 1}
             />
             {renderPaginationItems(getUsersList)}
             <Pagination.Next
@@ -275,9 +309,11 @@ export default function UsersList() {
                   getUsersList
                 )
               }
+              disabled={currentPage === totalPages}
             />
             <Pagination.Last
               onClick={() => handlePageChange(pageNumbers.length, getUsersList)}
+              disabled={currentPage === totalPages}
             />
           </Pagination>
         </>

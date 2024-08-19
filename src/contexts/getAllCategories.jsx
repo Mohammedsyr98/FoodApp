@@ -21,6 +21,8 @@ export const GetAllCategoriesProvider = ({ children }) => {
   } = useContext(paginationContext);
 
   const getCategoryList = async (pageSize = 4, pageNumber = 1) => {
+    filtrationSearch;
+    setIsLoading(true);
     try {
       let response = await axios.get(categoriesUrls.getCategory, {
         headers: {
@@ -37,15 +39,17 @@ export const GetAllCategoriesProvider = ({ children }) => {
         (_, i) => i + 1
       );
       setPageNumbers(pages);
+      pages;
       setAllCategories(response.data.data);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      error;
       setIsLoading(false);
     }
   };
 
   const getAllCategoriesForFilter = async () => {
+    setIsLoading(true);
     try {
       let response = await axios.get(categoriesUrls.getCategory, {
         headers: {
@@ -56,17 +60,17 @@ export const GetAllCategoriesProvider = ({ children }) => {
           pageNumber: 1,
         },
       });
-      console.log(response.data.data);
+
+      response.data.data;
+      setIsLoading(false);
+
       setAllCategoriesForFilter(response.data.data);
     } catch (error) {
-      console.log(error);
+      error;
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    getCategoryList();
-  }, [filtrationSearch]);
-  console.log(pageNumbers);
+
   return (
     <getAllCategoriesContext.Provider
       value={{
@@ -79,6 +83,7 @@ export const GetAllCategoriesProvider = ({ children }) => {
         getCategoryList,
         setIsLoading,
         setFiltrationSearch,
+        filtrationSearch,
       }}>
       {children}
     </getAllCategoriesContext.Provider>

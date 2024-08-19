@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FileUploader } from "react-drag-drop-files";
-import { FaCloudUploadAlt } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { getTags, resipesUrls } from "../../constants/EndPoints";
-import { useNavigate } from "react-router-dom";
-import { getAllCategoriesContext } from "../../contexts/getAllCategories";
-import { getAllTagsContext } from "../../contexts/getAllTags";
-import { paginationContext } from "../../contexts/Pagination";
-export default function AddRecipe() {
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getAllCategoriesContext } from "../../../../contexts/getAllCategories";
+import { getAllTagsContext } from "../../../../contexts/getAllTags";
+import { getRecipeInformationContext } from "../../../../contexts/EditRecipeContext";
+import { resipesUrls } from "../../../../constants/EndPoints";
+
+export default function EditRecipe() {
   const fileTypes = ["JPG", "PNG", "GIF"];
-  // const [tags, setTags] = useState([]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const recipeId = searchParams.get("id");
   const {
     register,
     handleSubmit,
@@ -24,41 +25,49 @@ export default function AddRecipe() {
   const handleChange = (file) => {
     setValue("recipeImage", file);
   };
+
   const {
-    pageNumbers,
-    currentPage,
-    setPageNumbers,
-    handlePageChange,
-    renderPaginationItems,
-  } = useContext(paginationContext);
-  const {
-    allCategories,
-    isLoading,
-    getCategoryList,
+    allCategoriesForFilter,
+    getAllCategoriesForFilter,
     setIsLoading,
-    setFiltrationSearch,
+    isLoading,
   } = useContext(getAllCategoriesContext);
   const { tags } = useContext(getAllTagsContext);
-  // const getAllTags = async (data) => {
-  //   try {
-  //     let response = await axios.get(getTags, {
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       },
-  //     });
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const getRecipe = async () => {
+    try {
+      let response = await axios.get(resipesUrls.getRecipeById(recipeId), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setSelectedRecipe(response.data);
 
-  //     setTags(response.data);
-  //   } catch (error) {
-  //      (error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   tags();
-  //   getCategoryList();
-  // }, []);
+      setIsLoading(false);
+    } catch (error) {
+      error;
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    getRecipe();
+  }, []);
+  useEffect(() => {
+    getAllCategoriesForFilter();
+
+    if (selectedRecipe) {
+      setValue("name", selectedRecipe.name);
+      setValue("tagId", selectedRecipe.tag.id);
+      setValue("price", selectedRecipe.price);
+      setValue("categoriesIds", selectedRecipe.category[0].id);
+      setValue("description", selectedRecipe.description);
+      selectedRecipe.category[0].id;
+    }
+    selectedRecipe;
+  }, [selectedRecipe]);
+
   const onSubmit = async (data) => {
     setIsLoading(true);
-    data;
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("tagId", data.tagId);
@@ -66,25 +75,26 @@ export default function AddRecipe() {
     formData.append("categoriesIds", data.categoriesIds);
     formData.append("description", data.description);
     formData.append("recipeImage", data.recipeImage ? data.recipeImage : "");
-    data.recipeImage;
+
     try {
-      let response = await axios.post(resipesUrls.getRecipes, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      response;
+      let response = await axios.put(
+        resipesUrls.editRecipe(selectedRecipe.id),
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setIsLoading(false);
-      toast.success(response.data.message);
+      toast.success("Recipe updated sucessfully");
+      navigate("/dashboard/recipes");
     } catch (error) {
       setIsLoading(false);
-      error;
       toast.error(error.response.data.message);
     }
   };
-  useEffect(() => {
-    getCategoryList(99999999999, 1);
-  }, [isLoading]);
+
   return (
     <div className="add-recipe">
       <div className="background">
@@ -94,9 +104,9 @@ export default function AddRecipe() {
               Fill the<span className="green-title"> Recipes</span> !
             </span>
             <span className="des">
-              you can now fill the meals easily using the table and form,{" "}
+              You can now fill the meals easily using the table and form,{" "}
               <br></br>
-              click here and sill it with the table !
+              click here and fill it with the table!
             </span>
           </div>
           <button
@@ -106,6 +116,7 @@ export default function AddRecipe() {
           </button>
         </div>
       </div>
+
       <form>
         <div>
           <div className="input-group">
@@ -114,7 +125,7 @@ export default function AddRecipe() {
               className="form-control py-2"
               placeholder="Recipe Name"
               {...register("name", {
-                required: "Recipe Name Is Reqiured",
+                required: "Recipe Name Is Required",
               })}
             />
           </div>
@@ -123,18 +134,19 @@ export default function AddRecipe() {
               <p className="text-danger ">{errors.name.message}</p>
             )}
           </div>
+
+          {/* For tags */}
           <select
             className="form-select form-control"
-            aria-label="Default select example"
             {...register("tagId", {
               required: "Tag Is Required",
             })}>
-            <option value="" disabled selected>
+            <option value="" disabled>
               Select tag
             </option>
             {tags.length > 0 ? (
-              tags.map((tag, i) => (
-                <option key={i} value={i + 1}>
+              tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>
                   {tag.name}
                 </option>
               ))
@@ -143,8 +155,11 @@ export default function AddRecipe() {
             )}
           </select>
           <div className="mb-3">
-            {errors.tag && <p className="text-danger ">{errors.tag.message}</p>}
+            {errors.tagId && (
+              <p className="text-danger ">{errors.tagId.message}</p>
+            )}
           </div>
+
           <div className="input-group">
             <input
               type="number"
@@ -154,25 +169,26 @@ export default function AddRecipe() {
                 required: "Price Is Required",
               })}
             />
-            {<span className="input-group-text">EGP</span>}
+            <span className="input-group-text">EGP</span>
           </div>
           <div className="mb-3">
             {errors.price && (
               <p className="text-danger ">{errors.price.message}</p>
             )}
           </div>
+
+          {/* For categories */}
           <select
             className="form-select  form-control"
-            aria-label="Default select example"
             {...register("categoriesIds", {
               required: "Category Is Required",
             })}>
-            <option value="" disabled selected>
+            <option value="" disabled>
               Select Category
             </option>
-            {allCategories.length > 0 ? (
-              allCategories.map((cat, i) => (
-                <option key={i} value={cat.id}>
+            {allCategoriesForFilter.length > 0 ? (
+              allCategoriesForFilter.map((cat) => (
+                <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))
@@ -181,10 +197,11 @@ export default function AddRecipe() {
             )}
           </select>
           <div className="mb-3">
-            {errors.category && (
-              <p className="text-danger ">{errors.category.message}</p>
+            {errors.categoriesIds && (
+              <p className="text-danger ">{errors.categoriesIds.message}</p>
             )}
           </div>
+
           <div className="input-group">
             <input
               type="text"
@@ -206,7 +223,13 @@ export default function AddRecipe() {
             handleChange={handleChange}
             name="file"
             types={fileTypes}
+            {...register("recipeImage", {
+              required: "The Image Is Required",
+            })}
           />
+          {errors.recipeImage && (
+            <p className="text-danger ">{errors.recipeImage.message}</p>
+          )}
         </div>
       </form>
       <div className="buttons text-end">

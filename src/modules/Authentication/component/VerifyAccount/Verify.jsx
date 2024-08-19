@@ -20,13 +20,13 @@ export default function Verify() {
   const onSubmit = async (data) => {
     try {
       let response = await axios.put(usersUrls.verify, data);
-      console.log(response);
+      response;
 
       navigate("/login");
       toast.success(response.data.message);
-      console.log(data);
+      data;
     } catch (error) {
-      console.log(error);
+      error;
 
       toast.error(error.response.data.message);
     }

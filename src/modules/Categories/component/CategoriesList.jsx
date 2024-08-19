@@ -9,41 +9,56 @@ import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { MdDeleteOutline, MdOutlineFindInPage } from "react-icons/md";
 import ConfirmModal from "../../Shared/components/ConfirmModal/ConfirmModal";
-import AddModal from "../../Shared/components/AddModal/AddModal";
+import AddModal from "./AddCategoryModal/AddCategoryModal";
+import ViewCategoryMadal from "../component/ViewCategoryModal/ViewCategoryModal";
+import EditCategoryModal from "../component/EditCategoryModal/EditCategoryModal";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { getAllCategoriesContext } from "../../../contexts/getAllCategories";
 import { paginationContext } from "../../../contexts/Pagination";
 import { Pagination } from "react-bootstrap";
 import NoData from "../../Shared/components/NoData/NoData";
+import { useSearchParams } from "react-router-dom";
 export default function CategoriesList() {
   const notify = (message) => toast(message);
   // const [categoryList, setCategoryList] = useState([]);
   const [show, setShow] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selecetedCategory, setSelectedCategory] = useState(null);
-
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleCloseAddModal = () => setShowAddModal(false);
   const handleShowAddModal = () => setShowAddModal(true);
+  const handleCloseViewModal = () => setShowViewModal(false);
+  const handleShowViewModal = () => setShowViewModal(true);
+  const handleCloseEditModal = () => setShowEditModal(false);
+  const handleShowEditModal = () => setShowEditModal(true);
   const {
     pageNumbers,
     currentPage,
     setPageNumbers,
     handlePageChange,
     renderPaginationItems,
+    setCurrentPage,
   } = useContext(paginationContext);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, []);
+
   const {
     allCategories,
     isLoading,
     getCategoryList,
     setIsLoading,
     setFiltrationSearch,
+    filtrationSearch,
   } = useContext(getAllCategoriesContext);
-  console.log(allCategories);
+  const pages = renderPaginationItems(getCategoryList);
+  const totalPages = pageNumbers.length;
   const deleteSelectedValue = async (id) => {
-    console.log(id);
+    id;
     setIsLoading(true);
     try {
       let response = await axios.delete(categoriesUrls.delete(id), {
@@ -55,7 +70,7 @@ export default function CategoriesList() {
 
       toast.success("Item deleted successfully");
     } catch (error) {
-      console.log(error);
+      error;
       setIsLoading(false);
     }
   };
@@ -74,6 +89,28 @@ export default function CategoriesList() {
 
     return readableDate;
   }
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleFilterChange = (filterType, value) => {
+    setFiltrationSearch({
+      ...filtrationSearch,
+      [filterType]: value,
+    });
+
+    searchParams.set(filterType, value);
+    setSearchParams(searchParams);
+  };
+  useEffect(() => {
+    getCategoryList();
+  }, [searchParams]);
+  useEffect(() => {
+    setFiltrationSearch({
+      ...filtrationSearch,
+      name: searchParams?.get("name"),
+    });
+
+    getCategoryList();
+  }, []);
 
   return (
     <div>
@@ -105,10 +142,9 @@ export default function CategoriesList() {
             type="text"
             className="form-control py-2"
             placeholder="Category Name"
+            value={searchParams.get("name")}
             onChange={(e) => {
-              setFiltrationSearch({
-                name: e.target.value,
-              });
+              handleFilterChange("name", e.target.value);
             }}
           />
         </div>
@@ -138,7 +174,7 @@ export default function CategoriesList() {
                     <span className="">
                       {convertISOToReadableDate(cat.modificationDate)}
                     </span>{" "}
-                    <Dropdown onClick={() => setSelectedCategory(cat.id)}>
+                    <Dropdown>
                       <Dropdown.Toggle
                         variant="none"
                         className="border-0"
@@ -147,14 +183,28 @@ export default function CategoriesList() {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item className="d-flex align-items-center">
+                        <Dropdown.Item
+                          className="d-flex align-items-center"
+                          onClick={() => {
+                            setSelectedCategory(cat);
+
+                            handleShowViewModal();
+                          }}>
                           <FaEye className="icon" /> View
                         </Dropdown.Item>
-                        <Dropdown.Item className="d-flex align-items-center">
+                        <Dropdown.Item
+                          className="d-flex align-items-center"
+                          onClick={() => {
+                            setSelectedCategory(cat);
+                            handleShowEditModal();
+                          }}>
                           <FaEdit className="icon" /> Edit
                         </Dropdown.Item>
                         <Dropdown.Item
-                          onClick={handleShow}
+                          onClick={() => {
+                            handleShow();
+                            setSelectedCategory(cat);
+                          }}
                           className="d-flex align-items-center">
                           <MdDeleteOutline className="icon" /> Delete
                         </Dropdown.Item>
@@ -169,13 +219,15 @@ export default function CategoriesList() {
           <Pagination>
             <Pagination.First
               onClick={() => handlePageChange(1, getCategoryList)}
+              disabled={currentPage === 1}
             />
             <Pagination.Prev
               onClick={() =>
                 handlePageChange(Math.max(currentPage - 1, 1), getCategoryList)
               }
+              disabled={currentPage === 1}
             />
-            {renderPaginationItems(getCategoryList)}
+            {pages}
             <Pagination.Next
               onClick={() =>
                 handlePageChange(
@@ -183,18 +235,20 @@ export default function CategoriesList() {
                   getCategoryList
                 )
               }
+              disabled={currentPage === totalPages}
             />
             <Pagination.Last
               onClick={() =>
                 handlePageChange(pageNumbers.length, getCategoryList)
               }
+              disabled={currentPage === totalPages}
             />
           </Pagination>
         </>
       )}
       <ConfirmModal
         handleClose={handleClose}
-        selecetedCategory={selecetedCategory}
+        selecetedCategory={selecetedCategory?.id}
         deleteSelectedValue={deleteSelectedValue}
         show={show}
         item={"Category"}
@@ -204,6 +258,21 @@ export default function CategoriesList() {
         showAddModal={showAddModal}
         getCategoryList={getCategoryList}
       />
+      {showViewModal && (
+        <ViewCategoryMadal
+          selecetedCategory={selecetedCategory}
+          showViewModal={showViewModal}
+          handleCloseViewModal={handleCloseViewModal}
+          convertISOToReadableDate={convertISOToReadableDate}
+        />
+      )}
+      {showEditModal && (
+        <EditCategoryModal
+          selecetedCategory={selecetedCategory}
+          showEditModal={showEditModal}
+          handleCloseEditModal={handleCloseEditModal}
+        />
+      )}
     </div>
   );
 }

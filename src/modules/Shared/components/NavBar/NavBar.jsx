@@ -8,7 +8,6 @@ export default function NavBar({
   setDropdownOpenned,
   dropdownOpenned,
 }) {
-  console.log(userInformation);
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid d-flex justify-content-between">

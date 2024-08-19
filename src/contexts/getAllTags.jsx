@@ -16,7 +16,7 @@ export const GetAllTagsProvider = ({ children }) => {
 
       setTags(response.data);
     } catch (error) {
-      console.log(error);
+      error;
     }
   };
   useEffect(() => {

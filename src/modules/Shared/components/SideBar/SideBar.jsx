@@ -8,10 +8,15 @@ import { PiCardsBold } from "react-icons/pi";
 import { SlCalender } from "react-icons/sl";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineLogout } from "react-icons/md";
+import { jwtDecode } from "jwt-decode";
+import { FaRegHeart } from "react-icons/fa";
+
 export default function SideBar() {
   const [sidebarCollaps, setSidebarCollaps] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const UserInformation = jwtDecode(localStorage.getItem("token"));
   const logOut = () => {
     localStorage.clear();
 
@@ -37,29 +42,48 @@ export default function SideBar() {
             component={<Link to={"home"} />}>
             Home
           </MenuItem>
-          <MenuItem
-            icon={<FiUsers />}
-            active={location.pathname === "/dashboard/users"}
-            component={<Link to={"users"} />}>
-            Users
-          </MenuItem>
+          {UserInformation.userGroup === "SuperAdmin" ? (
+            <>
+              <MenuItem
+                icon={<FiUsers />}
+                active={location.pathname === "/dashboard/users"}
+                component={<Link to={"users"} />}>
+                Users
+              </MenuItem>
+            </>
+          ) : (
+            <MenuItem
+              icon={<FaRegHeart />}
+              active={location.pathname === "/dashboard/favorites"}
+              component={<Link to={"favorites"} />}>
+              Favorites
+            </MenuItem>
+          )}
+
           <MenuItem
             icon={<PiCardsBold />}
             active={location.pathname === "/dashboard/recipes"}
             component={<Link to={"recipes"} />}>
             Recipes
           </MenuItem>
-          <MenuItem
-            icon={<SlCalender />}
-            active={location.pathname === "/dashboard/categoriesList"}
-            component={<Link to={"categoriesList"} />}>
-            Categories
-          </MenuItem>
-          <MenuItem
-            icon={<RiLockPasswordLine />}
-            active={location.pathname === "/dashboard/changePassword"}>
-            Change Password
-          </MenuItem>
+          {UserInformation.userGroup === "SuperAdmin" ? (
+            <>
+              <MenuItem
+                icon={<SlCalender />}
+                active={location.pathname === "/dashboard/categoriesList"}
+                component={<Link to={"categoriesList"} />}>
+                Categories
+              </MenuItem>
+              <MenuItem
+                icon={<RiLockPasswordLine />}
+                active={location.pathname === "/dashboard/changePassword"}>
+                Change Password
+              </MenuItem>
+            </>
+          ) : (
+            ""
+          )}
+
           <MenuItem
             icon={<MdOutlineLogout />}
             onClick={logOut}

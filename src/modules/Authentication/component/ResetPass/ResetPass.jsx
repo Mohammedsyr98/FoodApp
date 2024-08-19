@@ -33,7 +33,7 @@ export default function ResetPass() {
       SetIsLoading(false);
       toast.success(response.data.message);
     } catch (error) {
-      console.log(error.response);
+      error.response;
       toast.error(
         error.response.data.message === "Error on validating your request"
           ? "The confirm Password and password fields must match."

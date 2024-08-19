@@ -1,19 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import noData from "../../../../assets/noData.svg";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import axios from "axios";
 
 function ConfirmModal({
   handleClose,
   show,
-  selecetedCategory,
   deleteSelectedValue,
   item,
+  selecetedCategory,
 }) {
-  console.log(selecetedCategory);
+  selecetedCategory;
   return (
     <>
       <Modal show={show} onHide={handleClose}>

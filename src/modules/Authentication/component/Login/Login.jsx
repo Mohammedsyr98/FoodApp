@@ -26,7 +26,7 @@ export default function Login({ loginInformation }) {
     try {
       SetIsLoading(false);
       let response = await axios.post(usersUrls.login, data);
-      console.log(response);
+      response;
       navigate("/dashboard");
       toast.success("Login Succefully");
       loginInformation(response);

@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
 export const paginationContext = createContext();
@@ -8,12 +8,12 @@ export const PaginationProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const handlePageChange = (page, fetchData) => {
-    console.log(page);
     setCurrentPage(page);
     fetchData(4, page);
   };
 
   const renderPaginationItems = (fetchData) => {
+    pageNumbers;
     const totalPages = pageNumbers.length;
     const visiblePages = 5;
 
@@ -47,6 +47,7 @@ export const PaginationProvider = ({ children }) => {
         setPageNumbers,
         handlePageChange,
         renderPaginationItems,
+        setCurrentPage,
       }}>
       {children}
     </paginationContext.Provider>

@@ -18,13 +18,13 @@ export default function RequestResetPass() {
   const onSubmit = async (data) => {
     try {
       let response = await axios.post(usersUrls.resetRequest, data);
-      console.log(response);
+      response;
 
       navigate("/reset-passwword");
       toast.success(response.data.message);
-      console.log(data);
+      data;
     } catch (error) {
-      console.log(error);
+      error;
 
       toast.error(error.response.data.message);
     }
