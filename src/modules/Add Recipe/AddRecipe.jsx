@@ -58,7 +58,7 @@ export default function AddRecipe() {
   // }, []);
   const onSubmit = async (data) => {
     setIsLoading(true);
-    data;
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("tagId", data.tagId);
@@ -66,25 +66,25 @@ export default function AddRecipe() {
     formData.append("categoriesIds", data.categoriesIds);
     formData.append("description", data.description);
     formData.append("recipeImage", data.recipeImage ? data.recipeImage : "");
-    data.recipeImage;
+
     try {
       let response = await axios.post(resipesUrls.getRecipes, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      response;
+
       setIsLoading(false);
       toast.success(response.data.message);
     } catch (error) {
       setIsLoading(false);
-      error;
+
       toast.error(error.response.data.message);
     }
   };
   useEffect(() => {
     getCategoryList(99999999999, 1);
-  }, [isLoading]);
+  }, []);
   return (
     <div className="add-recipe">
       <div className="background">

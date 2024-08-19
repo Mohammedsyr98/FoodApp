@@ -96,7 +96,6 @@ export default function RecipesList() {
   const pages = renderPaginationItems(getRecipesList);
   const totalPages = pageNumbers.length;
   const deleteSelectedValue = async (id) => {
-    id;
     SetIsLoading(true);
     try {
       let response = await axios.delete(resipesUrls.delete(id), {
@@ -108,7 +107,6 @@ export default function RecipesList() {
 
       toast.success("Item deleted successfully");
     } catch (error) {
-      error;
       SetIsLoading(false);
     }
   };

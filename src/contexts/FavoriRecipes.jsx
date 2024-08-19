@@ -46,8 +46,10 @@ export const GetFavoriRecipesProvider = ({ children }) => {
       );
 
       toast.success("Recipe removed from Favorites");
+
       setIsloading(false);
       SetButtonState(false);
+      setFavoriRecipesList([]);
       getFavoriRecipe();
     } catch (error) {
       setIsloading(false);
@@ -59,6 +61,7 @@ export const GetFavoriRecipesProvider = ({ children }) => {
         getFavoriRecipe,
         favoriRecipesList,
         removeRecipeFromFavorite,
+        setFavoriRecipesList,
         isloading,
         setIsloading,
         buttonState,

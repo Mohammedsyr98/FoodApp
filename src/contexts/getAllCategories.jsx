@@ -7,7 +7,7 @@ export const getAllCategoriesContext = createContext();
 export const GetAllCategoriesProvider = ({ children }) => {
   const [allCategories, setAllCategories] = useState([]);
   const [pagesize, setPageSize] = useState(4);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [allCategoriesForFilter, setAllCategoriesForFilter] = useState([]);
   const [filtrationSearch, setFiltrationSearch] = useState({
     name: "",

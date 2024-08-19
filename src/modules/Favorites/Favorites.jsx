@@ -11,6 +11,7 @@ export default function Favorites() {
     removeRecipeFromFavorite,
     isloading,
   } = useContext(getFavoriRecipesContext);
+  console.log;
   const [buttonState, SetButtonState] = useState(false);
   useEffect(() => {
     getFavoriRecipe();
@@ -42,7 +43,7 @@ export default function Favorites() {
                     <p className="card-text">{recipe.recipe.description}</p>
                     <div className="w-100 text-center">
                       <button
-                        // disabled={isloading}
+                        disabled={isloading}
                         onClick={() => removeRecipeFromFavorite(recipe.id)}
                         className="confirm-delete text-center m-0 ">
                         {/* {isloading ? (
